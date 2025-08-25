@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/09 00:00:46 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/25 13:52:38 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,48 @@ void	parse_arguments(char **argv, t_args *args)
 	}
 	if (!args->cli_files_list)
 		ft_lstadd_back(&args->cli_files_list, ft_lstnew(ft_strdup("a.out")));
+}
+
+// Uses 'mmap' to map the entire file into memory in one shot. Way more 
+// efficient than reading the file multiple times. File size is kept for the
+// 'munmap' function to know how many bytes to unmap when the program finishes.
+// Returns true if mapping was successful, false otherwise.
+bool	mmap_file_content(t_args *args, char *file_name)
+{
+	struct stat	file_stat;
+	int			fd;
+
+	fd = open(file_name, O_RDONLY);
+	if (fd < 0)
+	{
+		ft_putstr_fd("ft_nm: '", STDERR_FILENO);
+		ft_putstr_fd(file_name, STDERR_FILENO);
+		ft_putstr_fd("': ", STDERR_FILENO);
+		perror("");
+		return (false);
+	}
+	if (fstat(fd, &file_stat) < 0)
+	{
+		close(fd);
+		perror("fstat");
+		return (false);
+	}
+	args->file_content = NULL;
+	args->file_size = 0;
+	if (file_stat.st_size > 0)
+	{
+		args->file_content = mmap(NULL, (size_t)file_stat.st_size, PROT_READ, \
+		MAP_PRIVATE, fd, 0);
+		if (args->file_content == MAP_FAILED)
+		{
+			close(fd);
+			perror("mmap");
+			return (false);
+		}
+		args->file_size = (uint64_t)file_stat.st_size;
+	}
+	close(fd);
+	if (file_stat.st_size == 0)
+		return (false);
+	return (true);
 }

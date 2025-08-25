@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/08 23:52:55 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/25 15:50:11 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,22 +24,13 @@
 # include <stdbool.h>				// for booleans
 # include <stdint.h>				// for fixed-width integer types
 # include <stdio.h>					// for perror
+# include <sys/mman.h>				// for mmap/munmap
+# include <fcntl.h>					// for open
 
 /*
 ** -.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-
 **                              DEFINES
 */
-
-# define COLOR_RESET			"\033[0m"		// reset color to default
-# define COLOR_DIRECTORY		"\033[01;34m"	// bold blue
-# define COLOR_SYMLINK			"\033[01;36m"	// bold cyan
-# define COLOR_EXECUTABLE		"\033[01;32m"	// bold green
-# define COLOR_SOCKET			"\033[01;35m"	// bold magenta
-# define COLOR_NAMED_PIPE		"\033[40;33m"	// yellow on black
-# define COLOR_DEVICE			"\033[01;37m"	// bold white
-# define COLOR_STICKY_DIR		"\033[30;42m"	// black on green
-# define COLOR_SETGID_FILE		"\033[30;43m"	// black on yellow
-# define COLOR_SETUID_FILE		"\033[30;41m"	// black on red
 
 /*
 ** -.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-
@@ -54,6 +45,9 @@ typedef struct s_args
 	bool		reverse_sort;		// option -r
 	bool		undefined_only;		// option -u
 	t_list		*cli_files_list;	// linked list of files to 'nm'
+	void		*file_content;		// pointer to the mapped file content
+	uint64_t	file_size;			// size of the current file
+	uint64_t	exit_status;		// exit status of the program
 }	t_args;
 
 /*
@@ -66,5 +60,6 @@ void		free_allocated_memory(t_args *args);
 
 /********************************** parser.c **********************************/
 void		parse_arguments(char **argv, t_args *args);
+bool		mmap_file_content(t_args *args, char *file_name);
 
 #endif

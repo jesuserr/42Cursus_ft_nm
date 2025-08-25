@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/09 00:09:18 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/25 14:01:35 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,16 @@ int	main(int argc, char **argv)
 	list = args.cli_files_list;
 	while (list)
 	{
-		ft_printf("Processing file: %s\n", (char *)list->content);
+		if (mmap_file_content(&args, (char *)list->content))
+		{
+			ft_printf("OK!! %s: %p ", (char *)list->content, args.file_content);
+			ft_printf("%d\n", (int)args.file_size);
+			munmap(args.file_content, (size_t)args.file_size);
+		}
+		else
+			args.exit_status++;
 		list = list->next;
 	}
 	free_allocated_memory(&args);
-	return (EXIT_SUCCESS);
+	return (args.exit_status);
 }
