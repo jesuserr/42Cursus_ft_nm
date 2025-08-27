@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/27 13:15:23 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:08:31 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,11 @@ typedef struct s_args
 /********************************** main.c ************************************/
 void		free_allocated_memory(t_args *args);
 
+/********************************** headers.c *********************************/
+uint8_t		extract_elf_header(t_args *args);
+
 /********************************** parser.c **********************************/
+void		free_allocated_memory(t_args *args);
 void		parse_arguments(char **argv, t_args *args);
 bool		mmap_file_content(t_args *args);
 

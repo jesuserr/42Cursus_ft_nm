@@ -6,11 +6,19 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/25 20:33:39 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:08:10 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
+
+// Frees memory allocated during program execution.
+void	free_allocated_memory(t_args *args)
+{
+	if (args->cli_files_list)
+		ft_lstclear(&args->cli_files_list, free);
+	return ;
+}
 
 static void	print_invalid_option_and_exit(const char option, t_args *args)
 {
