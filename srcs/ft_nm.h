@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/27 21:08:31 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/31 13:53:09 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,24 +51,34 @@ typedef struct s_args
 	char		*file_name;			// name of the current file
 	uint64_t	file_size;			// size of the current file
 	uint64_t	exit_status;		// exit status of the program
-	Elf32_Ehdr	elf32_header;		// ELF 32-bit header
-	Elf64_Ehdr	elf64_header;		// ELF 64-bit header
 }	t_args;
+
+typedef struct s_data
+{
+	Elf32_Ehdr	elf32_header;		// ELF 32-bit header
+	Elf32_Shdr	*elf32_sec_table;	// Pointer to 32-bit section header table
+	Elf32_Sym	*elf32_sym_table;	// Pointer to 32-bit symbol table
+	Elf64_Ehdr	elf64_header;		// ELF 64-bit header	
+	Elf64_Shdr	*elf64_sec_table;	// Pointer to 64-bit section header table
+	Elf64_Sym	*elf64_sym_table;	// Pointer to 64-bit symbol table
+	char		*str_table;			// Pointer to string table
+}	t_data;
 
 /*
 ** -.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-
 **                        FUNCTION PROTOTYPES
 */
 
-/********************************** main.c ************************************/
-void		free_allocated_memory(t_args *args);
-
 /********************************** headers.c *********************************/
-uint8_t		extract_elf_header(t_args *args);
+void		list_symbols(t_args *args, t_data *data);
 
 /********************************** parser.c **********************************/
 void		free_allocated_memory(t_args *args);
 void		parse_arguments(char **argv, t_args *args);
 bool		mmap_file_content(t_args *args);
+
+/********************************** print_errors.c ****************************/
+uint8_t		print_file_format_not_recognized(t_args *args);
+void		print_no_symbols(t_args *args);
 
 #endif

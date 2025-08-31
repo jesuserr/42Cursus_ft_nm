@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/27 21:08:10 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/31 20:50:39 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,8 @@ void	parse_arguments(char **argv, t_args *args)
 
 // Uses 'mmap' to map the entire file into memory in one shot. Way more 
 // efficient than reading the file multiple times. File size is kept for the
-// 'munmap' function to know how many bytes to unmap when the program finishes.
+// 'munmap' function to know how many bytes to unmap when the program finishes
+// (among other purposes).
 // Returns true if mapping was successful, false otherwise.
 bool	mmap_file_content(t_args *args)
 {

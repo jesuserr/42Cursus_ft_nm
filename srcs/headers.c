@@ -6,36 +6,25 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 20:41:42 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/27 22:45:41 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/08/31 21:18:56 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-static uint8_t	print_file_format_not_recognized(t_args *args)
-{
-	ft_putstr_fd("ft_nm: ", STDERR_FILENO);
-	ft_putstr_fd(args->file_name, STDERR_FILENO);
-	ft_putstr_fd(": file format not recognized\n", STDERR_FILENO);
-	args->exit_status++;
-	return (ELFCLASSNONE);
-}
-
 // Extracts the ELF header from the mapped file content. It checks the magic
 // number, class (32/64-bit), endianness, version and OS ABI from E_IDENT. If
-// E_IDENT seems valid, it copies entire ELF header to the corresponding struct
-// in t_args and returns class (32/64-bit), otherwise returns ELFCLASSNONE (0)
-// with an error message.
+// E_IDENT seems valid, it copies entire ELF header to the corresponding struct,
+// fills pointer to section header table and returns class (32/64-bit),
+// otherwise returns ELFCLASSNONE (0) with an error message.
 // The ELF header is 52 or 64 bytes long for 32-bit and 64-bit binaries.
 // *** Only E_IDENT is checked for validity, other fields are not checked. ***
-uint8_t	extract_elf_header(t_args *args)
+static uint8_t	extract_elf_header(t_args *args, t_data *data)
 {
 	uint32_t	magic_number;
 	char		*ptr;
 
 	ptr = (char *)args->file_content;
-	ft_bzero(&args->elf32_header, sizeof(Elf32_Ehdr));
-	ft_bzero(&args->elf64_header, sizeof(Elf64_Ehdr));
 	if (args->file_size < sizeof(Elf32_Ehdr))
 		return (print_file_format_not_recognized(args));
 	magic_number = *(uint32_t *)args->file_content;
@@ -44,8 +33,81 @@ uint8_t	extract_elf_header(t_args *args)
 	ptr[EI_VERSION] != EV_CURRENT || ptr[EI_OSABI] != ELFOSABI_SYSV)
 		return (print_file_format_not_recognized(args));
 	if (ptr[EI_CLASS] == ELFCLASS64)
-		ft_memcpy(&args->elf64_header, args->file_content, sizeof(Elf64_Ehdr));
+	{
+		ft_memcpy(&data->elf64_header, args->file_content, sizeof(Elf64_Ehdr));
+		if (data->elf64_header.e_shoff + (data->elf64_header.e_shentsize * \
+		data->elf64_header.e_shnum) > args->file_size)
+			return (print_file_format_not_recognized(args));
+		data->elf64_sec_table = (Elf64_Shdr *)(ptr + data->elf64_header.e_shoff);
+	}
 	else if (ptr[EI_CLASS] == ELFCLASS32)
-		ft_memcpy(&args->elf32_header, args->file_content, sizeof(Elf32_Ehdr));
+	{
+		ft_memcpy(&data->elf32_header, args->file_content, sizeof(Elf32_Ehdr));
+		if (data->elf32_header.e_shoff + (data->elf32_header.e_shentsize * \
+		data->elf32_header.e_shnum) > args->file_size)
+			return (print_file_format_not_recognized(args));
+		data->elf32_sec_table = (Elf32_Shdr *)(ptr + data->elf32_header.e_shoff);
+	}
 	return (ptr[EI_CLASS]);
+}
+
+// the idea is for this function to extract the symbols from the symtab section
+// and return them in a linked list of array of structs
+//printf("value = '%016lx' ", data->elf64_sym_table[i].st_value);
+//fflush(stdout);
+//printf("type = '%d' ", ELF64_ST_TYPE(data->elf64_sym_table[i].st_info));
+//ft_printf("value='%d'\n", data->elf64_sym_table[i].st_value);
+static void	extract_symbols_64(t_args *args, t_data *data)
+{
+	char		*ptr;
+	uint64_t	strtab_ix, symtab_ix;
+	uint64_t	i;
+	uint8_t		bind, type;
+
+	ptr = (char *)args->file_content;
+	for (symtab_ix = 0; symtab_ix < data->elf64_header.e_shnum; symtab_ix++)
+	{
+		if (data->elf64_sec_table[symtab_ix].sh_type == SHT_SYMTAB)
+		{
+			strtab_ix = data->elf64_sec_table[symtab_ix].sh_link;
+			data->str_table = ptr + data->elf64_sec_table[strtab_ix].sh_offset;
+			data->elf64_sym_table = (Elf64_Sym *)(ptr + data->elf64_sec_table[symtab_ix].sh_offset);
+			for (i = 1; i < data->elf64_sec_table[symtab_ix].sh_size / sizeof(Elf64_Sym); i++)
+			{
+				bind = ELF64_ST_BIND(data->elf64_sym_table[i].st_info);
+				type = ELF64_ST_TYPE(data->elf64_sym_table[i].st_info);
+				if (!args->debugger_only && (type == STT_FILE || \
+				type == STT_SECTION || data->elf64_sym_table[i].st_name == 0))
+					continue ;
+				if (args->undefined_only && data->elf64_sym_table[i].st_shndx != SHN_UNDEF)
+					continue ;
+				if (args->external_only && bind != STB_GLOBAL && bind != STB_WEAK)
+					continue ;
+				ft_printf("name='%s'\n", &data->str_table[data->elf64_sym_table[i].st_name]);
+			}
+			break ;
+		}
+	}
+	if (symtab_ix == data->elf64_header.e_shnum)
+		print_no_symbols(args);
+}
+
+void	list_symbols(t_args *args, t_data *data)
+{
+	uint8_t	elf_class;
+
+	if (ft_lstsize(args->cli_files_list) > 1)
+		ft_printf("%s:\n", args->file_name);
+	elf_class = extract_elf_header(args, data);
+	if (elf_class == ELFCLASS32)
+	{
+		ft_printf("32 bits ELF header extracted successfully!!\n");
+		ft_hex_dump(&data->elf32_header, sizeof(Elf32_Ehdr), 8);
+	}
+	else if (elf_class == ELFCLASS64)
+	{
+		ft_printf("64 bits ELF header extracted successfully!!\n");
+		extract_symbols_64(args, data);
+	}
+	munmap(args->file_content, (size_t)args->file_size);
 }

@@ -6,14 +6,14 @@
 #    By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/08 23:09:07 by jesuserr          #+#    #+#              #
-#    Updated: 2025/08/27 20:43:07 by jesuserr         ###   ########.fr        #
+#    Updated: 2025/08/31 20:42:52 by jesuserr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 LIBFT_DIR = libft/
 
 NAME = ft_nm
-SRCS =  main.c parser.c headers.c
+SRCS =  main.c parser.c headers.c print_errors.c
 
 PATH_SRCS = ./srcs/
 PATH_OBJS = ./srcs/objs/
@@ -24,7 +24,7 @@ DEPS = $(addprefix $(PATH_DEPS), $(SRCS:.c=.d))
 
 INCLUDE = -I./ -I./libft/includes/
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -pedantic -Wshadow #-fsanitize=address -g
+CFLAGS = -Wall -Wextra -Werror -pedantic -Wshadow #-g #-fsanitize=address
 
 NORM = $(addprefix $(PATH_SRCS), $(SRCS)) srcs/ft_nm.h
 GREEN = "\033[0;92m"
