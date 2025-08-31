@@ -6,11 +6,31 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/31 20:54:01 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 00:36:14 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
+
+static void	list_symbols(t_args *args, t_data *data)
+{
+	uint8_t	elf_class;
+
+	if (ft_lstsize(args->cli_files_list) > 1)
+		ft_printf("%s:\n", args->file_name);
+	elf_class = extract_elf_header(args, data);
+	if (elf_class == ELFCLASS32 && find_sym_table_32(args, data))
+	{
+		ft_printf("32 bits ELF header extracted successfully!!\n");
+		extract_symbols_32(args, data);
+	}
+	else if (elf_class == ELFCLASS64 && find_sym_table_64(args, data))
+	{
+		ft_printf("64 bits ELF header extracted successfully!!\n");
+		extract_symbols_64(args, data);
+	}
+	munmap(args->file_content, (size_t)args->file_size);
+}
 
 /*
 ** -.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-

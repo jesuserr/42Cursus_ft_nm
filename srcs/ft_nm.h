@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/31 13:53:09 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 01:13:08 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ typedef struct s_data
 	Elf64_Shdr	*elf64_sec_table;	// Pointer to 64-bit section header table
 	Elf64_Sym	*elf64_sym_table;	// Pointer to 64-bit symbol table
 	char		*str_table;			// Pointer to string table
+	uint64_t	sym_table_ix;		// Index of symtab header in sect hdr table
 }	t_data;
 
 /*
@@ -70,7 +71,11 @@ typedef struct s_data
 */
 
 /********************************** headers.c *********************************/
-void		list_symbols(t_args *args, t_data *data);
+uint8_t		extract_elf_header(t_args *args, t_data *data);
+bool		find_sym_table_32(t_args *args, t_data *data);
+void		extract_symbols_32(t_args *args, t_data *data);
+bool		find_sym_table_64(t_args *args, t_data *data);
+void		extract_symbols_64(t_args *args, t_data *data);
 
 /********************************** parser.c **********************************/
 void		free_allocated_memory(t_args *args);
@@ -79,6 +84,6 @@ bool		mmap_file_content(t_args *args);
 
 /********************************** print_errors.c ****************************/
 uint8_t		print_file_format_not_recognized(t_args *args);
-void		print_no_symbols(t_args *args);
+bool		print_no_symbols(t_args *args);
 
 #endif
