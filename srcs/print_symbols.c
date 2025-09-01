@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:14:54 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 21:29:06 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 21:44:06 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	print_symbols_32(t_data *data)
 	{
 		sym = (Elf32_Sym *)list->content;
 		type = get_symbol_type_32(sym, data->elf32_sec_table);
-		if (sym->st_value == 0 && (type == 'U' || type == 'w'))
+		if (type == 'U' || type == 'w')
 			print_char_n_times(' ', HEX_DIGITS_32 + 1);
 		else
 		{
@@ -131,7 +131,7 @@ void	print_symbols_64(t_data *data)
 	{
 		sym = (Elf64_Sym *)list->content;
 		type = get_symbol_type_64(sym, data->elf64_sec_table);
-		if (sym->st_value == 0 && (type == 'U' || type == 'w'))
+		if (type == 'U' || type == 'w')
 			print_char_n_times(' ', HEX_DIGITS_64 + 1);
 		else
 		{
