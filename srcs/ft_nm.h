@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 12:40:44 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 15:06:57 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,9 @@ bool		find_sym_table_32(t_args *args, t_data *data);
 void		extract_symbols_32(t_args *args, t_data *data);
 bool		find_sym_table_64(t_args *args, t_data *data);
 void		extract_symbols_64(t_args *args, t_data *data);
+
+/********************************** merge_sort.c ******************************/
+void		sort_list(t_list **list, t_data *data, bool reverse);
 
 /********************************** parser.c **********************************/
 void		free_allocated_memory(t_args *args);
