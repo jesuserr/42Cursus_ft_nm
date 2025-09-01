@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 12:26:23 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 13:41:50 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,9 @@ int	main(int argc, char **argv)
 			list_symbols(&args, &data);
 		else
 			args.exit_status++;
-		ft_printf("\n");
 		list = list->next;
+		if (list)
+			ft_printf("\n");
 	}
 	free_allocated_memory(&args);
 	return (args.exit_status);
