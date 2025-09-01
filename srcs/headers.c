@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 20:41:42 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 10:51:23 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 12:33:48 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,13 +83,14 @@ bool	find_sym_table_32(t_args *args, t_data *data)
 // Iterates through the 32-bit ELF symbol table and extracts symbols based on
 // command-line flags. Filters out file/section symbols unless debugger mode is
 // enabled, shows only undefined symbols if -u flag is set, or only external
-// symbols if -g flag is set.
+// symbols if -g flag is set. Selected symbols are copied into a linked list.
 void	extract_symbols_32(t_args *args, t_data *data)
 {
 	uint64_t	i;
 	uint8_t		bind;
 	uint8_t		type;
 	uint64_t	sym_count;
+	Elf32_Sym	*new_node;
 
 	sym_count = data->elf32_sec_table[data->sym_table_ix].sh_size / sizeof(Elf32_Sym);
 	for (i = 1; i < sym_count; i++)
@@ -103,7 +104,9 @@ void	extract_symbols_32(t_args *args, t_data *data)
 			continue ;
 		if (args->external_only && bind != STB_GLOBAL && bind != STB_WEAK)
 			continue ;
-		ft_printf("%s\n", &data->str_table[data->elf32_sym_table[i].st_name]);
+		new_node = malloc(sizeof(Elf32_Sym));
+		ft_memcpy(new_node, &data->elf32_sym_table[i], sizeof(Elf32_Sym));
+		ft_lstadd_back(&data->sym_list, ft_lstnew(new_node));
 	}
 }
 
@@ -137,13 +140,14 @@ bool	find_sym_table_64(t_args *args, t_data *data)
 // Iterates through the 64-bit ELF symbol table and extracts symbols based on 
 // command-line flags. Filters out file/section symbols unless debugger mode is
 // enabled, shows only undefined symbols if -u flag is set, or only external   
-// symbols if -g flag is set.
+// symbols if -g flag is set. Selected symbols are copied into a linked list.
 void	extract_symbols_64(t_args *args, t_data *data)
 {
 	uint64_t	i;
 	uint8_t		bind;
 	uint8_t		type;
 	uint64_t	sym_count;
+	Elf64_Sym	*new_node;
 
 	sym_count = data->elf64_sec_table[data->sym_table_ix].sh_size / sizeof(Elf64_Sym);
 	for (i = 1; i < sym_count; i++)
@@ -157,6 +161,8 @@ void	extract_symbols_64(t_args *args, t_data *data)
 			continue ;
 		if (args->external_only && bind != STB_GLOBAL && bind != STB_WEAK)
 			continue ;
-		ft_printf("%s\n", &data->str_table[data->elf64_sym_table[i].st_name]);
+		new_node = malloc(sizeof(Elf64_Sym));
+		ft_memcpy(new_node, &data->elf64_sym_table[i], sizeof(Elf64_Sym));
+		ft_lstadd_back(&data->sym_list, ft_lstnew(new_node));
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 01:13:08 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 12:40:44 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 **                              DEFINES
 */
 # define ELF_MAGIC_NUMBER		0x464C457F	// "\x7FELF" in little-endian
+# define HEX_DIGITS_32			8			// Number of hex digits in 32-bit
+# define HEX_DIGITS_64			16			// Number of hex digits in 64-bit
 
 /*
 ** -.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-.-'-
@@ -63,6 +65,7 @@ typedef struct s_data
 	Elf64_Sym	*elf64_sym_table;	// Pointer to 64-bit symbol table
 	char		*str_table;			// Pointer to string table
 	uint64_t	sym_table_ix;		// Index of symtab header in sect hdr table
+	t_list		*sym_list;			// Linked list of symbols
 }	t_data;
 
 /*
@@ -85,5 +88,13 @@ bool		mmap_file_content(t_args *args);
 /********************************** print_errors.c ****************************/
 uint8_t		print_file_format_not_recognized(t_args *args);
 bool		print_no_symbols(t_args *args);
+
+/********************************** print_symbols.c ***************************/
+void		print_symbols_32(t_data *data);
+void		print_symbols_64(t_data *data);
+
+/********************************** print_utils.c *****************************/
+uint8_t		count_hex_digits(uint64_t number);
+void		print_char_n_times(char character, uint16_t n);
 
 #endif

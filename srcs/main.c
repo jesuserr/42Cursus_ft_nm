@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 00:36:14 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 12:26:23 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,16 @@ static void	list_symbols(t_args *args, t_data *data)
 	elf_class = extract_elf_header(args, data);
 	if (elf_class == ELFCLASS32 && find_sym_table_32(args, data))
 	{
-		ft_printf("32 bits ELF header extracted successfully!!\n");
 		extract_symbols_32(args, data);
+		print_symbols_32(data);
 	}
 	else if (elf_class == ELFCLASS64 && find_sym_table_64(args, data))
 	{
-		ft_printf("64 bits ELF header extracted successfully!!\n");
 		extract_symbols_64(args, data);
+		print_symbols_64(data);
 	}
+	if (data->sym_list)
+		ft_lstclear(&data->sym_list, free);
 	munmap(args->file_content, (size_t)args->file_size);
 }
 
