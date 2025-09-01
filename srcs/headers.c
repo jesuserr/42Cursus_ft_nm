@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 20:41:42 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 01:12:16 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/01 10:51:23 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,11 @@
 // Extracts the ELF header from the mapped file content. It checks the magic
 // number, class (32/64-bit), endianness, version and OS ABI from E_IDENT. If
 // E_IDENT seems valid, it copies entire ELF header to the corresponding struct,
-// fills pointer to section header table and returns class (32/64-bit),
-// otherwise returns ELFCLASSNONE (0) with an error message.
-// The ELF header is 52 or 64 bytes long for 32-bit and 64-bit binaries.
-// *** Only E_IDENT is checked for validity, other fields are not checked. ***
+// determines pointer to section header table and returns class (32 or 64-bit).
+// If E_IDENT is not valid returns ELFCLASSNONE (0) with an error message.
+// The ELF header is 52 or 64 bytes long for 32-bit and 64-bit binaries. Only
+// E_IDENT is checked for file validity, more checks could be made, but this is
+// my balance for this project.
 uint8_t	extract_elf_header(t_args *args, t_data *data)
 {
 	uint32_t	magic_number;
@@ -30,7 +31,8 @@ uint8_t	extract_elf_header(t_args *args, t_data *data)
 	magic_number = *(uint32_t *)args->file_content;
 	if (magic_number != ELF_MAGIC_NUMBER || (ptr[EI_CLASS] != ELFCLASS64 && \
 	ptr[EI_CLASS] != ELFCLASS32) || ptr[EI_DATA] != ELFDATA2LSB || \
-	ptr[EI_VERSION] != EV_CURRENT || ptr[EI_OSABI] != ELFOSABI_SYSV)
+	ptr[EI_VERSION] != EV_CURRENT || (ptr[EI_OSABI] != ELFOSABI_SYSV && \
+	ptr[EI_OSABI] != ELFOSABI_LINUX))
 		return (print_file_format_not_recognized(args));
 	if (ptr[EI_CLASS] == ELFCLASS64)
 	{
@@ -51,22 +53,26 @@ uint8_t	extract_elf_header(t_args *args, t_data *data)
 	return (ptr[EI_CLASS]);
 }
 
+// Searches through the 32-bit ELF section header table to locate the symbol
+// table section (SHT_SYMTAB). When found, it stores the symbol table index,
+// calculates the symbol table pointer and finds the associated string table via
+// sh_link. Returns true on success and false if no symbol table is found.
 bool	find_sym_table_32(t_args *args, t_data *data)
 {
 	char		*ptr;
+	uint64_t	i;
 	uint64_t	strtab_ix;
-	uint64_t	symtab_ix;
 	uint32_t	symtab_offset;
 
 	ptr = (char *)args->file_content;
-	for (symtab_ix = 0; symtab_ix < data->elf32_header.e_shnum; symtab_ix++)
+	for (i = 0; i < data->elf32_header.e_shnum; i++)
 	{
-		if (data->elf32_sec_table[symtab_ix].sh_type == SHT_SYMTAB)
+		if (data->elf32_sec_table[i].sh_type == SHT_SYMTAB)
 		{
-			data->sym_table_ix = symtab_ix;
-			symtab_offset = data->elf32_sec_table[symtab_ix].sh_offset;
+			data->sym_table_ix = i;
+			symtab_offset = data->elf32_sec_table[i].sh_offset;
 			data->elf32_sym_table = (Elf32_Sym *)(ptr + symtab_offset);
-			strtab_ix = data->elf32_sec_table[symtab_ix].sh_link;
+			strtab_ix = data->elf32_sec_table[i].sh_link;
 			data->str_table = ptr + data->elf32_sec_table[strtab_ix].sh_offset;
 			return (true);
 		}
@@ -74,6 +80,10 @@ bool	find_sym_table_32(t_args *args, t_data *data)
 	return (print_no_symbols(args));
 }
 
+// Iterates through the 32-bit ELF symbol table and extracts symbols based on
+// command-line flags. Filters out file/section symbols unless debugger mode is
+// enabled, shows only undefined symbols if -u flag is set, or only external
+// symbols if -g flag is set.
 void	extract_symbols_32(t_args *args, t_data *data)
 {
 	uint64_t	i;
@@ -97,22 +107,26 @@ void	extract_symbols_32(t_args *args, t_data *data)
 	}
 }
 
+// Searches through the 64-bit ELF section header table to locate the symbol
+// table section (SHT_SYMTAB). When found, it stores the symbol table index,
+// calculates the symbol table pointer and finds the associated string table via
+// sh_link. Returns true on success and false if no symbol table is found.
 bool	find_sym_table_64(t_args *args, t_data *data)
 {
 	char		*ptr;
+	uint64_t	i;
 	uint64_t	strtab_ix;
-	uint64_t	symtab_ix;
 	uint64_t	symtab_offset;
 
 	ptr = (char *)args->file_content;
-	for (symtab_ix = 0; symtab_ix < data->elf64_header.e_shnum; symtab_ix++)
+	for (i = 0; i < data->elf64_header.e_shnum; i++)
 	{
-		if (data->elf64_sec_table[symtab_ix].sh_type == SHT_SYMTAB)
+		if (data->elf64_sec_table[i].sh_type == SHT_SYMTAB)
 		{
-			data->sym_table_ix = symtab_ix;
-			symtab_offset = data->elf64_sec_table[symtab_ix].sh_offset;
+			data->sym_table_ix = i;
+			symtab_offset = data->elf64_sec_table[i].sh_offset;
 			data->elf64_sym_table = (Elf64_Sym *)(ptr + symtab_offset);
-			strtab_ix = data->elf64_sec_table[symtab_ix].sh_link;
+			strtab_ix = data->elf64_sec_table[i].sh_link;
 			data->str_table = ptr + data->elf64_sec_table[strtab_ix].sh_offset;
 			return (true);
 		}
@@ -120,12 +134,10 @@ bool	find_sym_table_64(t_args *args, t_data *data)
 	return (print_no_symbols(args));
 }
 
-// the idea is for this function to extract the symbols from the symtab section
-// and return them in a linked list of array of structs
-//printf("value = '%016lx' ", data->elf64_sym_table[i].st_value);
-//fflush(stdout);
-//printf("type = '%d' ", ELF64_ST_TYPE(data->elf64_sym_table[i].st_info));
-//ft_printf("value='%d'\n", data->elf64_sym_table[i].st_value);
+// Iterates through the 64-bit ELF symbol table and extracts symbols based on 
+// command-line flags. Filters out file/section symbols unless debugger mode is
+// enabled, shows only undefined symbols if -u flag is set, or only external   
+// symbols if -g flag is set.
 void	extract_symbols_64(t_args *args, t_data *data)
 {
 	uint64_t	i;
