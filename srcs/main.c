@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:12:49 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:55:00 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	list_symbols(t_args *args, t_data *data)
 {
 	uint8_t	elf_class;
 
-	if (ft_lstsize(args->cli_files_list) > 1)
+	if (ft_lstsize(args->cli_files_list) > 1 && !args->just_symbols)
 		ft_printf("\n%s:\n", args->file_name);
 	elf_class = extract_elf_header(args, data);
 	if (elf_class == ELFCLASS32 && find_sym_table_32(args, data))
