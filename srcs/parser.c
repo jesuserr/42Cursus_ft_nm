@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/08/31 20:50:39 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:00:48 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static void	print_usage(void)
 		"  -g                      Display only external symbols\n"
 		"  -p                      Do not sort the symbols\n"
 		"  -r                      Reverse the sense of the sort\n"
+		"  -S                      Print size of defined symbols\n"
 		"  -u                      Display only undefined symbols\n\n"
 		"List symbols in [file(s)] (a.out by default).\n"
 		"ft_nm: supported targets: 32-bit (x86_32), 64-bit (x64), .o and .so\n"
@@ -71,6 +72,8 @@ void	parse_arguments(char **argv, t_args *args)
 					args->no_sort = true;
 				else if (argv[i][j] == 'r')
 					args->reverse_sort = true;
+				else if (argv[i][j] == 'S')
+					args->print_size = true;
 				else if (argv[i][j] == 'u')
 					args->undefined_only = true;
 				else

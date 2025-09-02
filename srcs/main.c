@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 12:26:29 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:12:49 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,14 @@ static void	list_symbols(t_args *args, t_data *data)
 		extract_symbols_32(args, data);
 		if (!args->no_sort)
 			sort_list(&data->sym_list, data, args->reverse_sort);
-		print_symbols_32(data);
+		print_symbols_32(args, data);
 	}
 	else if (elf_class == ELFCLASS64 && find_sym_table_64(args, data))
 	{
 		extract_symbols_64(args, data);
 		if (!args->no_sort)
 			sort_list(&data->sym_list, data, args->reverse_sort);
-		print_symbols_64(data);
+		print_symbols_64(args, data);
 	}
 	if (data->sym_list)
 		ft_lstclear(&data->sym_list, free);

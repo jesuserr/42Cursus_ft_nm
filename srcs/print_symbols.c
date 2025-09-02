@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:14:54 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 10:19:41 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:13:35 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static char	get_symbol_type_32(Elf32_Sym *symbol, Elf32_Shdr *sections)
 // or spaces for undefined/weak symbols), followed by the symbol type character
 // and name. For section symbols without names, displays the section name from
 // the section header string table.
-void	print_symbols_32(t_data *data)
+void	print_symbols_32(t_args *args, t_data *data)
 {
 	Elf32_Sym	*sym;
 	t_list		*list;
@@ -78,6 +78,11 @@ void	print_symbols_32(t_data *data)
 		{
 			print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_value));
 			ft_printf("%x ", sym->st_value);
+		}
+		if (sym->st_size && args->print_size)
+		{
+			print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_size));
+			ft_printf("%x ", sym->st_size);
 		}
 		ft_printf("%c ", type);
 		if (sym->st_name == 0 && ELF32_ST_TYPE(sym->st_info) == STT_SECTION)
@@ -138,7 +143,7 @@ static char	get_symbol_type_64(Elf64_Sym *symbol, Elf64_Shdr *sections)
 // or spaces for undefined/weak symbols), followed by the symbol type character
 // and name. For section symbols without names, displays the section name from
 // the section header string table.
-void	print_symbols_64(t_data *data)
+void	print_symbols_64(t_args *args, t_data *data)
 {
 	Elf64_Sym	*sym;
 	t_list		*list;
@@ -155,6 +160,11 @@ void	print_symbols_64(t_data *data)
 		{
 			print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_value));
 			ft_printf("%x ", sym->st_value);
+		}
+		if (sym->st_size && args->print_size)
+		{
+			print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_size));
+			ft_printf("%x ", sym->st_size);
 		}
 		ft_printf("%c ", type);
 		if (sym->st_name == 0 && ELF64_ST_TYPE(sym->st_info) == STT_SECTION)

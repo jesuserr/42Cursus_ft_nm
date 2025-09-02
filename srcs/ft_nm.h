@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 12:18:24 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:12:24 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_args
 	bool		external_only;		// option -g
 	bool		no_sort;			// option -p
 	bool		reverse_sort;		// option -r
+	bool		print_size;			// option -S
 	bool		undefined_only;		// option -u
 	t_list		*cli_files_list;	// linked list of files to 'nm'
 	void		*file_content;		// pointer to the mapped file content
@@ -91,8 +92,8 @@ void		parse_arguments(char **argv, t_args *args);
 bool		mmap_file_content(t_args *args);
 
 /********************************** print_symbols.c ***************************/
-void		print_symbols_32(t_data *data);
-void		print_symbols_64(t_data *data);
+void		print_symbols_32(t_args *args, t_data *data);
+void		print_symbols_64(t_args *args, t_data *data);
 
 /********************************** print_utils.c *****************************/
 uint8_t		print_file_format_not_recognized(t_args *args);
