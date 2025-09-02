@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 09:46:48 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 12:18:24 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,15 +90,13 @@ void		free_allocated_memory(t_args *args);
 void		parse_arguments(char **argv, t_args *args);
 bool		mmap_file_content(t_args *args);
 
-/********************************** print_errors.c ****************************/
-uint8_t		print_file_format_not_recognized(t_args *args);
-bool		print_no_symbols(t_args *args);
-
 /********************************** print_symbols.c ***************************/
 void		print_symbols_32(t_data *data);
 void		print_symbols_64(t_data *data);
 
 /********************************** print_utils.c *****************************/
+uint8_t		print_file_format_not_recognized(t_args *args);
+bool		print_no_symbols(t_args *args);
 uint8_t		count_hex_digits(uint64_t number);
 void		print_char_n_times(char character, uint16_t n);
 

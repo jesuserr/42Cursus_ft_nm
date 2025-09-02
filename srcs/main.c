@@ -6,12 +6,16 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 15:07:27 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 12:26:29 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
+// Processes and displays symbols from an ELF file. Determines ELF class
+// (32/64-bit), locates symbol table, extracts symbols, sorts them (unless -p
+// flag is set), and prints in nm format. Handles both 32-bit and 64-bit ELF
+// files with proper cleanup of allocated memory and file mapping.
 static void	list_symbols(t_args *args, t_data *data)
 {
 	uint8_t	elf_class;

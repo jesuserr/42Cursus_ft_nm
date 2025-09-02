@@ -6,15 +6,14 @@
 #    By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/08 23:09:07 by jesuserr          #+#    #+#              #
-#    Updated: 2025/09/01 14:17:30 by jesuserr         ###   ########.fr        #
+#    Updated: 2025/09/02 12:18:06 by jesuserr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 LIBFT_DIR = libft/
 
 NAME = ft_nm
-SRCS =  main.c parser.c headers.c print_errors.c print_utils.c print_symbols.c \
-		merge_sort.c
+SRCS =  main.c parser.c headers.c print_utils.c print_symbols.c merge_sort.c
 
 PATH_SRCS = ./srcs/
 PATH_OBJS = ./srcs/objs/
