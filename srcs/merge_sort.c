@@ -6,29 +6,49 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 00:22:47 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 15:31:05 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 10:07:33 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 // ****** File imported from ft_ls project, modified to fit ft_nm needs ***** //
 
-// Comparison function to sort the list by symbol name. Although it was primary
-// designed for 64-bit symbols, also works for 32-bit symbols since both
-// Elf32_Sym and Elf64_Sym structs have the same member name (st_name) at the
-// same offset (first member in both structs) and with the same size (4 bytes).
-// This is fragile code relying on implementation details of the ELF structures.
+// Comparison function to sort the list by symbol name. Handles both 32-bit and
+// 64-bit ELF symbols, extracting symbol names from either the string table or
+// section header string table (for section symbols without names). Supports
+// both normal and reverse sorting order based on the reverse flag.
 static int	compare(const void *a, const void *b, t_data *data, bool reverse)
 {
-	Elf64_Sym	*sym_a;
-	Elf64_Sym	*sym_b;
-	char		*name_a;
-	char		*name_b;
+	Elf64_Sym	*sym_a_64, *sym_b_64;
+	Elf32_Sym	*sym_a_32, *sym_b_32;
+	char		*name_a, *name_b;
 
-	sym_a = (Elf64_Sym *)a;
-	sym_b = (Elf64_Sym *)b;
-	name_a = &data->str_table[sym_a->st_name];
-	name_b = &data->str_table[sym_b->st_name];
+	if (data->elf_class == ELFCLASS32)
+	{
+		sym_a_32 = (Elf32_Sym *)a;
+		sym_b_32 = (Elf32_Sym *)b;
+		if (sym_a_32->st_name == 0 && ELF32_ST_TYPE(sym_a_32->st_info) == STT_SECTION)
+			name_a = &data->shstr_table[data->elf32_sec_table[sym_a_32->st_shndx].sh_name];
+		else
+			name_a = &data->str_table[sym_a_32->st_name];
+		if (sym_b_32->st_name == 0 && ELF32_ST_TYPE(sym_b_32->st_info) == STT_SECTION)
+			name_b = &data->shstr_table[data->elf32_sec_table[sym_b_32->st_shndx].sh_name];
+		else
+			name_b = &data->str_table[sym_b_32->st_name];
+	}
+	else if (data->elf_class == ELFCLASS64)
+	{
+		sym_a_64 = (Elf64_Sym *)a;
+		sym_b_64 = (Elf64_Sym *)b;
+		if (sym_a_64->st_name == 0 && ELF64_ST_TYPE(sym_a_64->st_info) == STT_SECTION)
+			name_a = &data->shstr_table[data->elf64_sec_table[sym_a_64->st_shndx].sh_name];
+		else
+			name_a = &data->str_table[sym_a_64->st_name];
+		if (sym_b_64->st_name == 0 && ELF64_ST_TYPE(sym_b_64->st_info) == STT_SECTION)
+			name_b = &data->shstr_table[data->elf64_sec_table[sym_b_64->st_shndx].sh_name];
+		else
+			name_b = &data->str_table[sym_b_64->st_name];
+	}
 	if (reverse)
 		return (ft_strcmp(name_b, name_a));
 	else

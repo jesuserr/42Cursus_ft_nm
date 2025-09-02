@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 20:41:42 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 12:33:48 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 09:58:35 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,19 +50,22 @@ uint8_t	extract_elf_header(t_args *args, t_data *data)
 			return (print_file_format_not_recognized(args));
 		data->elf32_sec_table = (Elf32_Shdr *)(ptr + data->elf32_header.e_shoff);
 	}
+	data->elf_class = ptr[EI_CLASS];
 	return (ptr[EI_CLASS]);
 }
 
 // Searches through the 32-bit ELF section header table to locate the symbol
 // table section (SHT_SYMTAB). When found, it stores the symbol table index,
 // calculates the symbol table pointer and finds the associated string table via
-// sh_link. Returns true on success and false if no symbol table is found.
+// sh_link. Also finds the section header string table. Returns true on success
+// and false if no symbol table is found.
 bool	find_sym_table_32(t_args *args, t_data *data)
 {
 	char		*ptr;
 	uint64_t	i;
 	uint64_t	strtab_ix;
 	uint32_t	symtab_offset;
+	uint16_t	shstrndx;
 
 	ptr = (char *)args->file_content;
 	for (i = 0; i < data->elf32_header.e_shnum; i++)
@@ -74,6 +77,8 @@ bool	find_sym_table_32(t_args *args, t_data *data)
 			data->elf32_sym_table = (Elf32_Sym *)(ptr + symtab_offset);
 			strtab_ix = data->elf32_sec_table[i].sh_link;
 			data->str_table = ptr + data->elf32_sec_table[strtab_ix].sh_offset;
+			shstrndx = data->elf32_header.e_shstrndx;
+			data->shstr_table = ptr + data->elf32_sec_table[shstrndx].sh_offset;
 			return (true);
 		}
 	}
@@ -113,13 +118,15 @@ void	extract_symbols_32(t_args *args, t_data *data)
 // Searches through the 64-bit ELF section header table to locate the symbol
 // table section (SHT_SYMTAB). When found, it stores the symbol table index,
 // calculates the symbol table pointer and finds the associated string table via
-// sh_link. Returns true on success and false if no symbol table is found.
+// sh_link. Also finds the section header string table. Returns true on success
+// and false if no symbol table is found.
 bool	find_sym_table_64(t_args *args, t_data *data)
 {
 	char		*ptr;
 	uint64_t	i;
 	uint64_t	strtab_ix;
 	uint64_t	symtab_offset;
+	uint16_t	shstrndx;
 
 	ptr = (char *)args->file_content;
 	for (i = 0; i < data->elf64_header.e_shnum; i++)
@@ -131,6 +138,8 @@ bool	find_sym_table_64(t_args *args, t_data *data)
 			data->elf64_sym_table = (Elf64_Sym *)(ptr + symtab_offset);
 			strtab_ix = data->elf64_sec_table[i].sh_link;
 			data->str_table = ptr + data->elf64_sec_table[strtab_ix].sh_offset;
+			shstrndx = data->elf64_header.e_shstrndx;
+			data->shstr_table = ptr + data->elf64_sec_table[shstrndx].sh_offset;
 			return (true);
 		}
 	}

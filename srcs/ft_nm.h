@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/01 15:06:57 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 09:46:48 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,10 @@ typedef struct s_data
 	Elf64_Shdr	*elf64_sec_table;	// Pointer to 64-bit section header table
 	Elf64_Sym	*elf64_sym_table;	// Pointer to 64-bit symbol table
 	char		*str_table;			// Pointer to string table
+	char		*shstr_table;		// Pointer to section header string table
 	uint64_t	sym_table_ix;		// Index of symtab header in sect hdr table
 	t_list		*sym_list;			// Linked list of symbols
+	uint8_t		elf_class;			// ELF class (ELFCLASS32 or ELFCLASS64)
 }	t_data;
 
 /*
