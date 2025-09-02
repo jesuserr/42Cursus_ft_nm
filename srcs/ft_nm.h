@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:12:24 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:29:30 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,10 @@ typedef struct s_args
 {
 	bool		debugger_only;		// option -a
 	bool		external_only;		// option -g
+	bool		just_symbols;		// option -j (extra bonus)
 	bool		no_sort;			// option -p
 	bool		reverse_sort;		// option -r
-	bool		print_size;			// option -S
+	bool		print_size;			// option -S (extra bonus)
 	bool		undefined_only;		// option -u
 	t_list		*cli_files_list;	// linked list of files to 'nm'
 	void		*file_content;		// pointer to the mapped file content

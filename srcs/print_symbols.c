@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:14:54 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:13:35 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:41:02 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,19 +72,22 @@ void	print_symbols_32(t_args *args, t_data *data)
 	{
 		sym = (Elf32_Sym *)list->content;
 		type = get_symbol_type_32(sym, data->elf32_sec_table);
-		if (type == 'U' || type == 'w' || type == 'v')
-			print_char_n_times(' ', HEX_DIGITS_32 + 1);
-		else
+		if (!args->just_symbols)
 		{
-			print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_value));
-			ft_printf("%x ", sym->st_value);
+			if (type == 'U' || type == 'w' || type == 'v')
+				print_char_n_times(' ', HEX_DIGITS_32 + 1);
+			else
+			{
+				print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_value));
+				ft_printf("%x ", sym->st_value);
+			}
+			if (sym->st_size && args->print_size)
+			{
+				print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_size));
+				ft_printf("%x ", sym->st_size);
+			}
+			ft_printf("%c ", type);
 		}
-		if (sym->st_size && args->print_size)
-		{
-			print_char_n_times('0', HEX_DIGITS_32 - count_hex_digits(sym->st_size));
-			ft_printf("%x ", sym->st_size);
-		}
-		ft_printf("%c ", type);
 		if (sym->st_name == 0 && ELF32_ST_TYPE(sym->st_info) == STT_SECTION)
 			ft_printf("%s\n", \
 			&data->shstr_table[data->elf32_sec_table[sym->st_shndx].sh_name]);
@@ -154,19 +157,22 @@ void	print_symbols_64(t_args *args, t_data *data)
 	{
 		sym = (Elf64_Sym *)list->content;
 		type = get_symbol_type_64(sym, data->elf64_sec_table);
-		if (type == 'U' || type == 'w' || type == 'v')
-			print_char_n_times(' ', HEX_DIGITS_64 + 1);
-		else
+		if (!args->just_symbols)
 		{
-			print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_value));
-			ft_printf("%x ", sym->st_value);
+			if (type == 'U' || type == 'w' || type == 'v')
+				print_char_n_times(' ', HEX_DIGITS_64 + 1);
+			else
+			{
+				print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_value));
+				ft_printf("%x ", sym->st_value);
+			}
+			if (sym->st_size && args->print_size)
+			{
+				print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_size));
+				ft_printf("%x ", sym->st_size);
+			}
+			ft_printf("%c ", type);
 		}
-		if (sym->st_size && args->print_size)
-		{
-			print_char_n_times('0', HEX_DIGITS_64 - count_hex_digits(sym->st_size));
-			ft_printf("%x ", sym->st_size);
-		}
-		ft_printf("%c ", type);
 		if (sym->st_name == 0 && ELF64_ST_TYPE(sym->st_info) == STT_SECTION)
 			ft_printf("%s\n", \
 			&data->shstr_table[data->elf64_sec_table[sym->st_shndx].sh_name]);

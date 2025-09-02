@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:00:48 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:30:19 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ static void	print_usage(void)
 		"  --help                  Display this help and exit\n"
 		"  -a                      Display debugger-only symbols\n"
 		"  -g                      Display only external symbols\n"
+		"  -j                      Display only symbol names\n"
 		"  -p                      Do not sort the symbols\n"
 		"  -r                      Reverse the sense of the sort\n"
 		"  -S                      Print size of defined symbols\n"
@@ -68,6 +69,8 @@ void	parse_arguments(char **argv, t_args *args)
 					args->debugger_only = true;
 				else if (argv[i][j] == 'g')
 					args->external_only = true;
+				else if (argv[i][j] == 'j')
+					args->just_symbols = true;
 				else if (argv[i][j] == 'p')
 					args->no_sort = true;
 				else if (argv[i][j] == 'r')
