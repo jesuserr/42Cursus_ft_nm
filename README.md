@@ -16,9 +16,11 @@ Based on the official 42 School subject (Version 3.1):
 ### Technical Requirements
 - Work with ELF binaries on Linux (x86_32, x64 architectures)
 - Support object files (.o), shared libraries (.so), and executables
-- Output must match system `nm` (order, offset, padding)
+- Output must match system `nm` (order, offset, padding)*
 - Robust error handling - no crashes (segfaults, bus errors, double free)
 - Use of custom libft library with proper Makefile integration
+
+*\*Note: Symbol ordering uses custom `ft_strcmp` implementation - set `LC_ALL=C` for exact system `nm` output matching*
 
 ## ✨ Features
 
