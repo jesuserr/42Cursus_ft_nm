@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:09:50 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:29:30 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/04 11:09:02 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void		print_symbols_64(t_args *args, t_data *data);
 /********************************** print_utils.c *****************************/
 uint8_t		print_file_format_not_recognized(t_args *args);
 bool		print_no_symbols(t_args *args);
+bool		print_warning_is_directory(t_args *args);
 uint8_t		count_hex_digits(uint64_t number);
 void		print_char_n_times(char character, uint16_t n);
 

@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 23:12:45 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:30:19 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/04 11:21:53 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,11 @@ bool	mmap_file_content(t_args *args)
 		close(fd);
 		perror("fstat");
 		return (false);
+	}
+	if (S_ISDIR(file_stat.st_mode))
+	{
+		close(fd);
+		return (print_warning_is_directory(args));
 	}
 	args->file_content = NULL;
 	args->file_size = 0;
