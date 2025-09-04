@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:14:54 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 13:41:02 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/04 13:02:14 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,10 @@
 // W/w=weak symbols, V/v=weak object symbols, N/n=debug symbols (sections),
 // i=indirect function (GNU IFUNC). Uppercase indicates global binding or
 // special cases (debug sections), lowercase is local binding.
-static char	get_symbol_type_32(Elf32_Sym *symbol, Elf32_Shdr *sections)
+static char	get_symbol_type_32(Elf32_Sym *symbol, t_data *data)
 {
 	Elf32_Shdr	*section;
+	char		*sh_name;
 
 	if (ELF32_ST_TYPE(symbol->st_info) == STT_GNU_IFUNC)
 		return ('i');
@@ -40,11 +41,17 @@ static char	get_symbol_type_32(Elf32_Sym *symbol, Elf32_Shdr *sections)
 		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'a' : 'A';
 	if (symbol->st_shndx >= SHN_LORESERVE)
 		return ('?');
-	section = &sections[symbol->st_shndx];
+	section = &data->elf32_sec_table[symbol->st_shndx];
+	sh_name = &data->shstr_table[section->sh_name];
+	if (ft_strcmp(sh_name, ".SUNW_signature") == 0)
+		return ('n');
 	if (ELF32_ST_TYPE(symbol->st_info) == STT_SECTION && \
-	(section->sh_type == SHT_PROGBITS || section->sh_type == SHT_STRTAB) && \
 	!(section->sh_flags & SHF_ALLOC))
-		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'n' : 'N';
+	{
+		if (ft_strncmp(sh_name, ".debug", 6) == 0)
+			return ('N');
+		return ((ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'n' : 'N');
+	}
 	if (section->sh_flags & SHF_EXECINSTR)
 		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 't' : 'T';
 	else if (section->sh_type == SHT_NOBITS)
@@ -52,7 +59,7 @@ static char	get_symbol_type_32(Elf32_Sym *symbol, Elf32_Shdr *sections)
 	else if (section->sh_flags & SHF_WRITE)
 		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'd' : 'D';
 	else
-		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'r' : 'R';		
+		return (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'r' : 'R';
 	return ('?');
 }
 
@@ -71,7 +78,7 @@ void	print_symbols_32(t_args *args, t_data *data)
 	while (list)
 	{
 		sym = (Elf32_Sym *)list->content;
-		type = get_symbol_type_32(sym, data->elf32_sec_table);
+		type = get_symbol_type_32(sym, data);
 		if (!args->just_symbols)
 		{
 			if (type == 'U' || type == 'w' || type == 'v')
@@ -103,9 +110,10 @@ void	print_symbols_32(t_args *args, t_data *data)
 // W/w=weak symbols, V/v=weak object symbols, N/n=debug symbols (sections),
 // i=indirect function (GNU IFUNC). Uppercase indicates global binding or
 // special cases (debug sections), lowercase is local binding.
-static char	get_symbol_type_64(Elf64_Sym *symbol, Elf64_Shdr *sections)
+static char	get_symbol_type_64(Elf64_Sym *symbol, t_data *data)
 {
 	Elf64_Shdr	*section;
+	char		*sh_name;
 
 	if (ELF64_ST_TYPE(symbol->st_info) == STT_GNU_IFUNC)
 		return ('i');
@@ -125,11 +133,17 @@ static char	get_symbol_type_64(Elf64_Sym *symbol, Elf64_Shdr *sections)
 		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'a' : 'A';
 	if (symbol->st_shndx >= SHN_LORESERVE)
 		return ('?');
-	section = &sections[symbol->st_shndx];
+	section = &data->elf64_sec_table[symbol->st_shndx];
+	sh_name = &data->shstr_table[section->sh_name];
+	if (ft_strcmp(sh_name, ".SUNW_signature") == 0)
+		return ('n');
 	if (ELF64_ST_TYPE(symbol->st_info) == STT_SECTION && \
-	(section->sh_type == SHT_PROGBITS || section->sh_type == SHT_STRTAB) && \
 	!(section->sh_flags & SHF_ALLOC))
-		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'n' : 'N';
+	{
+		if (ft_strncmp(sh_name, ".debug", 6) == 0)
+			return ('N');
+		return ((ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'n' : 'N');
+	}
 	if (section->sh_flags & SHF_EXECINSTR)
 		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 't' : 'T';
 	else if (section->sh_type == SHT_NOBITS)
@@ -137,7 +151,7 @@ static char	get_symbol_type_64(Elf64_Sym *symbol, Elf64_Shdr *sections)
 	else if (section->sh_flags & SHF_WRITE)
 		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'd' : 'D';
 	else
-		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'r' : 'R';		
+		return (ELF64_ST_BIND(symbol->st_info) == STB_LOCAL) ? 'r' : 'R';
 	return ('?');
 }
 
@@ -156,7 +170,7 @@ void	print_symbols_64(t_args *args, t_data *data)
 	while (list)
 	{
 		sym = (Elf64_Sym *)list->content;
-		type = get_symbol_type_64(sym, data->elf64_sec_table);
+		type = get_symbol_type_64(sym, data);
 		if (!args->just_symbols)
 		{
 			if (type == 'U' || type == 'w' || type == 'v')
