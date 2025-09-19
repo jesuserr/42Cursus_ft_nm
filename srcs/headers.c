@@ -6,7 +6,7 @@
 /*   By: jesuserr <jesuserr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 20:41:42 by jesuserr          #+#    #+#             */
-/*   Updated: 2025/09/02 09:58:35 by jesuserr         ###   ########.fr       */
+/*   Updated: 2025/09/20 00:13:37 by jesuserr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,10 @@ bool	find_sym_table_32(t_args *args, t_data *data)
 void	extract_symbols_32(t_args *args, t_data *data)
 {
 	uint64_t	i;
-	uint8_t		bind;
-	uint8_t		type;
+	uint8_t		bind, type;
 	uint64_t	sym_count;
 	Elf32_Sym	*new_node;
+	t_list		*last_node;
 
 	sym_count = data->elf32_sec_table[data->sym_table_ix].sh_size / sizeof(Elf32_Sym);
 	for (i = 1; i < sym_count; i++)
@@ -111,7 +111,16 @@ void	extract_symbols_32(t_args *args, t_data *data)
 			continue ;
 		new_node = malloc(sizeof(Elf32_Sym));
 		ft_memcpy(new_node, &data->elf32_sym_table[i], sizeof(Elf32_Sym));
-		ft_lstadd_back(&data->sym_list, ft_lstnew(new_node));
+		if (!data->sym_list)
+		{
+			data->sym_list = ft_lstnew(new_node);
+			last_node = data->sym_list;
+		}
+		else
+		{
+			last_node->next = ft_lstnew(new_node);
+			last_node = last_node->next;
+		}
 	}
 }
 
@@ -153,10 +162,10 @@ bool	find_sym_table_64(t_args *args, t_data *data)
 void	extract_symbols_64(t_args *args, t_data *data)
 {
 	uint64_t	i;
-	uint8_t		bind;
-	uint8_t		type;
+	uint8_t		bind, type;
 	uint64_t	sym_count;
 	Elf64_Sym	*new_node;
+	t_list		*last_node;
 
 	sym_count = data->elf64_sec_table[data->sym_table_ix].sh_size / sizeof(Elf64_Sym);
 	for (i = 1; i < sym_count; i++)
@@ -172,6 +181,23 @@ void	extract_symbols_64(t_args *args, t_data *data)
 			continue ;
 		new_node = malloc(sizeof(Elf64_Sym));
 		ft_memcpy(new_node, &data->elf64_sym_table[i], sizeof(Elf64_Sym));
-		ft_lstadd_back(&data->sym_list, ft_lstnew(new_node));
+		if (!data->sym_list)
+		{
+			data->sym_list = ft_lstnew(new_node);
+			last_node = data->sym_list;
+		}
+		else
+		{
+			last_node->next = ft_lstnew(new_node);
+			last_node = last_node->next;
+		}
 	}
 }
+
+// Note on 'extract_symbols_64' and 'extract_symbols_32' functions:
+// Project was evaluated using ft_lstadd_back() to add new nodes at the
+// end of the list, resulting in O(n²) complexity, since the whole list had to
+// be traversed to find the last node on each insertion, resulting in very long
+// execution times for large symbol tables (i.e. liblldb.so with ~150K symbols).
+// For optimization, a pointer to the last node is maintained and new nodes are
+// appended directly, achieving O(n).
